@@ -17,10 +17,10 @@ export default function RootLayout() {
     });
 
     return unsubscribe;
-  }, []);
+  }, [setUser, setLoading]);
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || !segments?.length) return;
 
     const inAuthGroup = segments[0] === '(auth)';
     
@@ -32,7 +32,7 @@ export default function RootLayout() {
       // For now, redirect to user dashboard
       router.replace('/(user)');
     }
-  }, [user, segments, loading]);
+  }, [user, segments, loading, router]);
 
   if (loading) {
     return (
