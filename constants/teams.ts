@@ -1,0 +1,1 @@
+export const TEAMS = { ASHANDTH: 'Ashandth Team', MADHUKA: 'Madhuka Team' };
