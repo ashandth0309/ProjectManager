@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../lib/firebase';
@@ -30,7 +30,6 @@ export default function RootLayout() {
     } else if (user && inAuthGroup) {
       // Redirect away from auth pages if authenticated
       // For now, redirect to user dashboard
-      // In a real app, you'd check the user's role here
       router.replace('/(user)');
     }
   }, [user, segments, loading]);
