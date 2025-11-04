@@ -9,8 +9,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../lib/firebase';
 import { useAuth } from '../../hooks/useAuth';
 
 export default function Login() {
@@ -19,7 +22,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { signIn } = useAuth();
+  const { setUser } = useAuth();
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -30,14 +33,35 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await signIn(email.trim(), password);
-      // The redirect will be handled automatically by the auth state listener
+      const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
+      const user = userCredential.user;
+      
+      // Set user in context (you'll need to implement this in useAuth)
+      setUser(user);
+      
+      // Check user role and redirect accordingly
+      // For now, redirect to user dashboard
+      router.replace('/(user)');
     } catch (error: any) {
       console.error('Login error:', error);
       
       let errorMessage = 'Failed to login. Please try again.';
-      if (error.message) {
-        errorMessage = error.message;
+      switch (error.code) {
+        case 'auth/invalid-email':
+          errorMessage = 'Invalid email address';
+          break;
+        case 'auth/user-disabled':
+          errorMessage = 'This account has been disabled';
+          break;
+        case 'auth/user-not-found':
+          errorMessage = 'No account found with this email';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'Incorrect password';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many failed attempts. Please try again later';
+          break;
       }
       
       Alert.alert('Login Failed', errorMessage);
@@ -47,26 +71,16 @@ export default function Login() {
   };
 
   const handleAdminLogin = () => {
-    if (router && router.push) {
-      router.push('/(auth)/admin-login');
-    }
+    router.push('/(auth)/admin-login');
   };
-  
+
   const handleRegister = () => {
-    if (router && router.push) {
-      router.push('/(auth)/register');
-    } else {
-      // Fallback or retry logic
-      setTimeout(() => {
-        if (router && router.push) {
-          router.push('/(auth)/register');
-        }
-      }, 100);
-    }
+    router.push('/(auth)/register');
   };
 
   const handleForgotPassword = () => {
     Alert.alert('Forgot Password', 'Password reset functionality would go here');
+    // router.push('/(auth)/forgot-password');
   };
 
   return (
@@ -80,7 +94,7 @@ export default function Login() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>OFFICE TRACKER</Text>
+          <Text style={styles.title}>InternBridge</Text>
           <Text style={styles.subtitle}>User Login</Text>
         </View>
 

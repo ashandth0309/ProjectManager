@@ -12,11 +12,11 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
-import { useAuth } from '../../../hooks/useAuth';
-import Header from '../../../components/layout/Header';
-import TeamMemberPopup from '../../../components/dashboard/TeamMemberPopup';
-import { Team } from '../../../types/team';
+import { db } from '../../lib/firebase';
+import { useAuth } from '../../hooks/useAuth';
+import Header from '../../components/layout/Header';
+import TeamMemberPopup from '../../components/dashboard/TeamMemberPopup';
+import { Team } from '../../types/team';
 
 export default function AddProject() {
   const [projectName, setProjectName] = useState('');

@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, onSnapshot, collection, query, where, orderBy, updateDoc } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
-import { useAuth } from '../../../hooks/useAuth';
-import Header from '../../../components/layout/Header';
-import TaskCard from '../../../components/dashboard/TaskCard';
-import { Sprint } from '../../../types/sprint';
-import { Task } from '../../../types/task';
-import { Project } from '../../../types/project';
+import { db } from '../../lib/firebase';
+import { useAuth } from '../../hooks/useAuth';
+import Header from '../../components/layout/Header';
+import TaskCard from '../../components/dashboard/TaskCard';
+import { Sprint } from '../../types/sprint';
+import { Task } from '../../types/task';
+import { Project } from '../../types/project';
 
 export default function SprintDetail() {
   const { id, projectId } = useLocalSearchParams();

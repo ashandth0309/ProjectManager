@@ -15,7 +15,7 @@ import { db } from '../../lib/firebase';
 import { useAuth } from '../../hooks/useAuth';
 import Header from '../../components/layout/Header';
 import TaskCard from '../../components/dashboard/TaskCard';
-import { Task } from '../../../types/task';
+import { Task } from '../../types/task';
 
 export default function UserTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
