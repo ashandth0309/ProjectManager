@@ -13,8 +13,8 @@ import {
 import { useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../../../lib/firebase';
-import { useAuth } from '../../../hooks/useAuth';
+import { auth, db } from '../../lib/firebase';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');

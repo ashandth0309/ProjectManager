@@ -13,8 +13,8 @@ import {
 import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../../../lib/firebase';
-import { useAuth } from '../../../hooks/useAuth';
+import { auth, db } from '../../lib/firebase';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function Register() {
   const [formData, setFormData] = useState({

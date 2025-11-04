@@ -10,11 +10,11 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
-import { useAuth } from '../../../hooks/useAuth';
-import ProjectCard from '../../../components/dashboard/ProjectCard';
-import Header from '../../../components/layout/Header';
-import { Project } from '../../../types/project';
+import { db } from '../../lib/firebase';
+import { useAuth } from '../../hooks/useAuth';
+import ProjectCard from '../../components/dashboard/ProjectCard';
+import Header from '../../components/layout/Header';
+import { Project } from '../../types/project';
 
 export default function AdminDashboard() {
   const [projects, setProjects] = useState<Project[]>([]);

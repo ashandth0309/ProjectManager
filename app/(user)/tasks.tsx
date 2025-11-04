@@ -11,11 +11,11 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
-import { useAuth } from '../../../hooks/useAuth';
-import Header from '../../../components/layout/Header';
-import TaskCard from '../../../components/dashboard/TaskCard';
-import { Task } from '../../../types/task';
+import { db } from '../../lib/firebase';
+import { useAuth } from '../../hooks/useAuth';
+import Header from '../../components/layout/Header';
+import TaskCard from '../../components/dashboard/TaskCard';
+import { Task } from '../../types/task';
 
 export default function UserTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);

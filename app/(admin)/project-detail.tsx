@@ -10,16 +10,16 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, onSnapshot, collection, query, where, orderBy } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
-import { useAuth } from '../../../hooks/useAuth';
-import Header from '../../../components/layout/Header';
-import SprintCard from '../../../components/dashboard/SprintCard';
-import TaskCard from '../../../components/dashboard/TaskCard';
-import TeamMemberPopup from '../../../components/dashboard/TeamMemberPopup';
-import { Project } from '../../../types/project';
-import { Sprint } from '../../../types/sprint';
-import { Task } from '../../../types/task';
-import { Team } from '../../../types/team';
+import { db } from '../../lib/firebase';
+import { useAuth } from '../../hooks/useAuth';
+import Header from '../../components/layout/Header';
+import SprintCard from '../../components/dashboard/SprintCard';
+import TaskCard from '../../components/dashboard/TaskCard';
+import TeamMemberPopup from '../../components/dashboard/TeamMemberPopup';
+import { Project } from '../../types/project';
+import { Sprint } from '../../types/sprint';
+import { Task } from '../../types/task';
+import { Team } from '../../types/team';
 
 export default function ProjectDetail() {
   const { id } = useLocalSearchParams();

@@ -7,6 +7,8 @@ import {
   updateEmail,
   updatePassword,
   EmailAuthProvider,
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
   reauthenticateWithCredential
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
