@@ -1,8 +1,19 @@
 import { initializeApp } from 'firebase/app';
-import { initializeAuth } from 'firebase/auth';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { initializeFirestore, memoryLocalCache, persistentLocalCache } from 'firebase/firestore';
+
+// Replace your current Firestore initialization with:
+const firestore = initializeFirestore(app, {
+  localCache: persistentLocalCache(/* settings */)
+});
+
+// OR if you want memory cache (temporary):
+// const firestore = initializeFirestore(app, {
+//   localCache: memoryLocalCache()
+// });
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -24,6 +35,7 @@ import { getAuth } from 'firebase/auth';
 export const auth = getAuth(app);
 // Initialize Cloud Firestore and enable offline persistence
 const db = getFirestore(app);
+
 
 // Enable Firestore offline persistence
 enableIndexedDbPersistence(db)
