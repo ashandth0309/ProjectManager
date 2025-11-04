@@ -22,7 +22,7 @@ export default function UserDashboard() {
   const [recentProjects, setRecentProjects] = useState<Project[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, signOut } = useAuth(); // Make sure signOut is available from useAuth
   const router = useRouter();
 
   useEffect(() => {
@@ -73,6 +73,32 @@ export default function UserDashboard() {
     setTimeout(() => setRefreshing(false), 1000);
   };
 
+  const handleSignOut = async () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut();
+              // Router will automatically handle redirect based on your auth state
+            } catch (error) {
+              console.error('Error signing out:', error);
+              Alert.alert('Error', 'Failed to sign out');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const handleTaskStatusChange = async (taskId: string, newStatus: string) => {
     try {
       // In a real app, you would update this in Firebase
@@ -121,9 +147,14 @@ export default function UserDashboard() {
         title="My Dashboard" 
         showBackButton={false}
         rightComponent={
-          <TouchableOpacity onPress={handleViewAllTasks}>
-            <Text style={styles.viewAllButton}>View All Tasks</Text>
-          </TouchableOpacity>
+          <View style={styles.headerRightContainer}>
+            <TouchableOpacity onPress={handleViewAllTasks} style={styles.headerButton}>
+              <Text style={styles.viewAllButton}>View All</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleSignOut} style={styles.headerButton}>
+              <Text style={styles.signOutButton}>Sign Out</Text>
+            </TouchableOpacity>
+          </View>
         }
       />
       
@@ -416,8 +447,21 @@ const styles = StyleSheet.create({
     color: '#007bff',
     fontWeight: '500',
   },
+  // Updated header styles
+  headerRightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerButton: {
+    marginLeft: 16,
+  },
   viewAllButton: {
     color: '#007bff',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  signOutButton: {
+    color: '#dc3545',
     fontWeight: '600',
     fontSize: 14,
   },
