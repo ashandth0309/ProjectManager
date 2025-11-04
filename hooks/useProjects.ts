@@ -195,6 +195,7 @@ export function useProjects() {
       setLoading(false);
     }
   };
+  };
 
   // Sprint Management
   const createSprint = async (sprintData: Omit<Sprint, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {

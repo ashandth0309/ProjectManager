@@ -1,38 +1,39 @@
 import React, { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../lib/firebase';
 import { useAuth } from '../hooks/useAuth';
 import { View, Text, ActivityIndicator } from 'react-native';
 
 export default function RootLayout() {
-  const { user, setUser, loading, setLoading } = useAuth();
+  const { user, userProfile, loading } = useAuth();
   const router = useRouter();
   const segments = useSegments();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-
-    return unsubscribe;
-  }, []);
 
   useEffect(() => {
     if (loading) return;
 
     const inAuthGroup = segments[0] === '(auth)';
     
+    console.log('Auth State:', { user: user?.email, userProfile, inAuthGroup, segments });
+
     if (!user && !inAuthGroup) {
       // Redirect to login if not authenticated
+      console.log('Redirecting to login');
       router.replace('/(auth)/login');
-    } else if (user && inAuthGroup) {
-      // Redirect away from auth pages if authenticated
-      // For now, redirect to user dashboard
-      router.replace('/(user)');
+    } else if (user) {
+      // Check user role and redirect accordingly
+      if (userProfile?.role === 'admin') {
+        if (segments[0] !== '(admin)') {
+          console.log('Redirecting to admin dashboard');
+          router.replace('/(admin)');
+        }
+      } else {
+        if (segments[0] !== '(user)') {
+          console.log('Redirecting to user dashboard');
+          router.replace('/(user)');
+        }
+      }
     }
-  }, [user, segments, loading]);
+  }, [user, userProfile, segments, loading]);
 
   if (loading) {
     return (

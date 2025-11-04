@@ -11,10 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../../../lib/firebase';
-import { useAuth } from '../../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -28,7 +25,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
-  const { setUser } = useAuth();
+  const { signUp } = useAuth();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -69,58 +66,20 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // Create user in Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(
-        auth, 
-        formData.email.trim(), 
-        formData.password
+      await signUp(
+        formData.email.trim(),
+        formData.password,
+        formData.firstName.trim(),
+        formData.lastName.trim()
       );
       
-      const user = userCredential.user;
-
-      // Update user profile with display name
-      await updateProfile(user, {
-        displayName: `${formData.firstName} ${formData.lastName}`
-      });
-
-      // Create user document in Firestore
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        email: formData.email.trim(),
-        displayName: `${formData.firstName} ${formData.lastName}`,
-        role: 'user',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-
-      // Set user in context
-      setUser(user);
-      
-      Alert.alert('Success', 'Account created successfully!', [
-        {
-          text: 'OK',
-          onPress: () => router.replace('/(user)'),
-        },
-      ]);
+      Alert.alert('Success', 'Account created successfully!');
     } catch (error: any) {
       console.error('Registration error:', error);
       
       let errorMessage = 'Failed to create account. Please try again.';
-      switch (error.code) {
-        case 'auth/email-already-in-use':
-          errorMessage = 'An account with this email already exists';
-          break;
-        case 'auth/invalid-email':
-          errorMessage = 'Invalid email address';
-          break;
-        case 'auth/operation-not-allowed':
-          errorMessage = 'Email/password accounts are not enabled';
-          break;
-        case 'auth/weak-password':
-          errorMessage = 'Password is too weak';
-          break;
+      if (error.message) {
+        errorMessage = error.message;
       }
       
       Alert.alert('Registration Failed', errorMessage);

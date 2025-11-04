@@ -11,12 +11,11 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
-import { UserRole } from '../constants/roles';
+
+export type UserRole = 'admin' | 'user';
 
 interface AuthUser extends User {
   role?: UserRole;
-  displayName?: string | null;
-  email?: string | null;
 }
 
 interface UserProfile {
@@ -58,37 +57,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
+        console.log('Auth state changed:', user?.email);
+        
         if (user) {
           // User is signed in
           const userWithRole: AuthUser = { ...user };
           
           // Get user profile from Firestore
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
-          if (userDoc.exists()) {
-            const profileData = userDoc.data() as UserProfile;
-            setUserProfile(profileData);
-            userWithRole.role = profileData.role;
-          } else {
-            // Create user profile if it doesn't exist
-            const newProfile: UserProfile = {
-              uid: user.uid,
-              email: user.email || '',
-              displayName: user.displayName || '',
-              firstName: user.displayName?.split(' ')[0] || '',
-              lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
-              role: 'user',
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            };
-            
-            await setDoc(doc(db, 'users', user.uid), newProfile);
-            setUserProfile(newProfile);
-            userWithRole.role = 'user';
+          try {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+              const profileData = userDoc.data() as UserProfile;
+              setUserProfile(profileData);
+              userWithRole.role = profileData.role;
+              console.log('User profile loaded:', profileData);
+            } else {
+              // Create user profile if it doesn't exist
+              console.log('Creating new user profile');
+              const newProfile: UserProfile = {
+                uid: user.uid,
+                email: user.email || '',
+                displayName: user.displayName || '',
+                firstName: user.displayName?.split(' ')[0] || '',
+                lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
+                role: 'user',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              };
+              
+              await setDoc(doc(db, 'users', user.uid), newProfile);
+              setUserProfile(newProfile);
+              userWithRole.role = 'user';
+            }
+          } catch (profileError) {
+            console.error('Error loading user profile:', profileError);
           }
           
           setUser(userWithRole);
         } else {
           // User is signed out
+          console.log('User signed out');
           setUser(null);
           setUserProfile(null);
         }
@@ -107,9 +115,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       setError(null);
+      console.log('Signing in:', email);
       
       const { signInWithEmailAndPassword } = await import('firebase/auth');
       await signInWithEmailAndPassword(auth, email, password);
+      
+      console.log('Sign in successful');
     } catch (error: any) {
       console.error('Sign in error:', error);
       let errorMessage = 'Failed to sign in';
@@ -133,10 +144,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         case 'auth/network-request-failed':
           errorMessage = 'Network error. Please check your connection';
           break;
+        default:
+          errorMessage = error.message || errorMessage;
       }
       
       setError(errorMessage);
-      throw error;
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -146,6 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       setError(null);
+      console.log('Signing up:', email);
       
       const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth');
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -169,6 +183,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       await setDoc(doc(db, 'users', user.uid), userProfile);
       setUserProfile(userProfile);
+      
+      console.log('Sign up successful');
     } catch (error: any) {
       console.error('Sign up error:', error);
       let errorMessage = 'Failed to create account';
@@ -189,10 +205,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         case 'auth/network-request-failed':
           errorMessage = 'Network error. Please check your connection';
           break;
+        default:
+          errorMessage = error.message || errorMessage;
       }
       
       setError(errorMessage);
-      throw error;
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
