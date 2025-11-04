@@ -45,16 +45,22 @@ export default function AdminDashboard() {
   };
 
   const handleAddProject = () => {
-    router.push('/(admin)/add-project');
-  };
+  console.log('Add Project button pressed');
+  Alert.alert('Button Test', 'Add Project button works!'); // Test if button works
+  router.push('/(admin)/add-project');
+};
 
-  const handleProjectPress = (projectId: string) => {
-    router.push(`/(admin)/project-detail?id=${projectId}`);
-  };
+const handleProjectPress = (projectId: string) => {
+  console.log('Project pressed:', projectId);
+  Alert.alert('Button Test', `Project ${projectId} pressed!`);
+  router.push(`/(admin)/project-detail?id=${projectId}`);
+};
 
-  const handleSummaryPress = () => {
-    router.push('/(admin)/summary');
-  };
+const handleSummaryPress = () => {
+  console.log('Summary button pressed');
+  Alert.alert('Button Test', 'Summary button works!');
+  router.push('/(admin)/summary');
+};
 
   return (
     <View style={styles.container}>
