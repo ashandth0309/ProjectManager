@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import { initializeAuth } from 'firebase/auth';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,23 +7,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "your-api-key",
-  authDomain: "internbridge-app.firebaseapp.com",
-  projectId: "internbridge-app",
-  storageBucket: "internbridge-app.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456",
-  measurementId: "G-XXXXXXXXXX"
+  apiKey: "AIzaSyBkp3qmLU_Tz6Qn0zzieK5ywXKwnkMDXhw",
+  authDomain: "project-manager-7af52.firebaseapp.com",
+  projectId: "project-manager-7af52",
+  storageBucket: "project-manager-7af52.firebasestorage.app",
+  messagingSenderId: "1081525548027",
+  appId: "1:1081525548027:web:f425ebbefa8b59eacb915e",
+  measurementId: "G-WQG8PMEVTT"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase Authentication with AsyncStorage persistence
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage)
-});
-
+import { getAuth } from 'firebase/auth';
+export const auth = getAuth(app);
 // Initialize Cloud Firestore and enable offline persistence
 const db = getFirestore(app);
 
@@ -47,7 +45,7 @@ enableIndexedDbPersistence(db)
 const storage = getStorage(app);
 
 // Firebase services export
-export { app, auth, db, storage };
+
 
 // Default export for the Firebase app
 export default app;

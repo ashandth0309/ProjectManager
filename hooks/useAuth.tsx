@@ -1,4 +1,5 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+// hooks/useAuth.ts
+import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { 
   User,
   signOut,
@@ -13,12 +14,16 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
-import { UserRole } from '../constants/roles';
 
+// Define UserRole if you don't have it in constants/roles
+export type UserRole = 'admin' | 'manager' | 'user';
+
+// Fix: Remove displayName and email since they already exist in User interface
 interface AuthUser extends User {
   role?: UserRole;
-  displayName?: string | null;
-  email?: string | null;
+  // Remove these - they're already in the base User interface
+  // displayName?: string | null;
+  // email?: string | null;
 }
 
 interface UserProfile {
@@ -49,41 +54,64 @@ interface AuthContextType {
   isAuthenticated: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Create context with default value
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  userProfile: null,
+  loading: true,
+  error: null,
+  signIn: async () => {},
+  signUp: async () => {},
+  signOut: async () => {},
+  updateUserProfile: async () => {},
+  updateUserEmail: async () => {},
+  updateUserPassword: async () => {},
+  clearError: () => {},
+  isAdmin: false,
+  isAuthenticated: false,
+});
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
-        if (user) {
+        if (firebaseUser) {
           // User is signed in
-          const userWithRole: AuthUser = { ...user };
+          const userWithRole: AuthUser = { 
+            ...firebaseUser,
+            role: undefined
+          };
           
           // Get user profile from Firestore
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             const profileData = userDoc.data() as UserProfile;
             setUserProfile(profileData);
             userWithRole.role = profileData.role;
           } else {
             // Create user profile if it doesn't exist
+            const displayName = firebaseUser.displayName || '';
             const newProfile: UserProfile = {
-              uid: user.uid,
-              email: user.email || '',
-              displayName: user.displayName || '',
-              firstName: user.displayName?.split(' ')[0] || '',
-              lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              displayName: displayName,
+              firstName: displayName.split(' ')[0] || '',
+              lastName: displayName.split(' ').slice(1).join(' ') || '',
               role: 'user',
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
             };
             
-            await setDoc(doc(db, 'users', user.uid), newProfile);
+            await setDoc(doc(db, 'users', firebaseUser.uid), newProfile);
             setUserProfile(newProfile);
             userWithRole.role = 'user';
           }
@@ -110,7 +138,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       setError(null);
       
-      const { signInWithEmailAndPassword } = await import('firebase/auth');
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error: any) {
       console.error('Sign in error:', error);
@@ -149,7 +176,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       setError(null);
       
-      const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth');
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
