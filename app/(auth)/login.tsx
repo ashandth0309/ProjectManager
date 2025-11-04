@@ -47,11 +47,22 @@ export default function Login() {
   };
 
   const handleAdminLogin = () => {
-    router.push('/(auth)/admin-login');
+    if (router && router.push) {
+      router.push('/(auth)/admin-login');
+    }
   };
-
+  
   const handleRegister = () => {
-    router.push('/(auth)/register');
+    if (router && router.push) {
+      router.push('/(auth)/register');
+    } else {
+      // Fallback or retry logic
+      setTimeout(() => {
+        if (router && router.push) {
+          router.push('/(auth)/register');
+        }
+      }, 100);
+    }
   };
 
   const handleForgotPassword = () => {
